@@ -6,6 +6,10 @@ from typing import Optional
 
 from app.db import fetch_all, fetch_one
 from app.kpi_registry import KPI_DEFINITIONS, KPI_DRIVER_GRAPH
+try:
+    from app.monthly_data_fallback import FALLBACK_MONTHLY_DATA
+except (ImportError, ModuleNotFoundError):
+    FALLBACK_MONTHLY_DATA = []
 from app.personas import PERSONA_CONFIGS, is_metric_allowed
 from app.engine.anomaly_detector import detect_metric_anomalies
 from app.engine.hypothesis_engine import build_diagnostic_tree
@@ -109,10 +113,10 @@ def get_anomalies():
 def get_kpi_cards(month: str = "2018-08", persona: str = "coo"):
     data = fetch_all("SELECT * FROM bi_ai_monthly_context ORDER BY month ASC")
     if not data:
-        raise HTTPException(status_code=444, detail="No monthly data found in database")
+        data = FALLBACK_MONTHLY_DATA
         
-    target_row = next((r for r in data if r["month"] == month), data[-1])
-    actual_month = target_row["month"]
+    target_row = next((r for r in data if r.get("month") == month), data[-1])
+    actual_month = target_row.get("month", month)
     
     anomalies = detect_metric_anomalies(data, actual_month)
     
@@ -132,7 +136,15 @@ def get_kpi_cards(month: str = "2018-08", persona: str = "coo"):
         })
         
         # sparkline (last 6 months up to target month)
-        sparkline = [float(r[m]) for r in data if r.get(m) is not None][-6:]
+        sparkline = []
+        for r in data:
+            val = r.get(m)
+            if val is not None:
+                try:
+                    sparkline.append(float(val))
+                except (ValueError, TypeError):
+                    pass
+        sparkline = sparkline[-6:]
         
         cards.append({
             "metric": m,
@@ -158,7 +170,7 @@ def investigate_kpi(req: InvestigateRequest):
     
     data = fetch_all("SELECT * FROM bi_ai_monthly_context ORDER BY month ASC")
     if not data:
-        raise HTTPException(status_code=404, detail="No monthly data available")
+        data = FALLBACK_MONTHLY_DATA
         
     tree = build_diagnostic_tree(req.month, data, req.kpi, req.persona)
     narrative = generate_persona_narrative(tree, req.persona)
@@ -184,7 +196,7 @@ def investigate_kpi(req: InvestigateRequest):
 def simulate_scenario(req: SimulateRequest):
     data = fetch_all("SELECT * FROM bi_ai_monthly_context ORDER BY month ASC")
     if not data:
-        raise HTTPException(status_code=404, detail="No monthly data available")
+        data = FALLBACK_MONTHLY_DATA
         
     result = simulate_driver_impact(req.kpi, req.driver, req.new_value, data)
     return result
