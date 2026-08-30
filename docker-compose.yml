@@ -8,7 +8,7 @@ services:
     env_file:
       - ./Backend/.env
     environment:
-      - DATABASE_URL=postgresql://postgres:9qRYM_6$$&izta&!@db.jdfpfuursllupsrvmnko.supabase.co:5432/postgres
+      - DATABASE_URL=postgresql://postgres.jdfpfuursllupsrvmnko:9qRYM_6$$&izta&!@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s

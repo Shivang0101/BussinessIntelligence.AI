@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_HOST = os.getenv("DB_HOST", "db.jdfpfuursllupsrvmnko.supabase.co")
+DB_HOST = os.getenv("DB_HOST", "aws-0-ap-northeast-2.pooler.supabase.com")
 DB_PORT = int(os.getenv("DB_PORT", 5432))
 DB_NAME = os.getenv("DB_NAME", "postgres")
-DB_USER = os.getenv("DB_USER", "postgres")
+DB_USER = os.getenv("DB_USER", "postgres.jdfpfuursllupsrvmnko")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "9qRYM_6$&izta&!")
 
 def get_db_connection():
