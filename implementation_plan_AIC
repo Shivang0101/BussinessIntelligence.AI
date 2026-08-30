@@ -509,7 +509,6 @@ npm run dev
 | `Backend/app/feedback.py` | Store/retrieve feedback per hypothesis | 🟢 NO |
 
 ### Frontend Files
-
 | File | Purpose |
 |------|---------|
 | `Frontend/Dockerfile` | Node 22-alpine, installs deps, runs vite dev |

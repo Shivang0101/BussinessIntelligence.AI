@@ -4,45 +4,22 @@ import { Database, Cpu, Zap, Clock, DollarSign } from 'lucide-react';
 export default function TelemetryBar({ telemetry }) {
   if (!telemetry) return null;
 
-  return (
-    <div 
-      className="glass-panel" 
-      style={{ 
-        padding: '10px 20px', 
-        marginTop: '24px', 
-        display: 'flex', 
-        justify: 'space-between', 
-        alignItems: 'center',
-        fontSize: '0.75rem',
-        color: 'var(--text-muted)',
-        fontFamily: 'var(--font-mono)'
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Database size={14} color="var(--primary-accent)" />
-          <span>SQL Queries: <strong style={{ color: '#fff' }}>{telemetry.sql_queries_executed}</strong></span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Cpu size={14} color="var(--status-yellow)" />
-          <span>Gemini Calls: <strong style={{ color: '#fff' }}>{telemetry.gemini_calls}</strong></span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Zap size={14} color="var(--status-green)" />
-          <span>Tokens: <strong style={{ color: '#fff' }}>{telemetry.tokens_used}</strong></span>
-        </div>
-      </div>
+  const items = [
+    { icon: <Database size={13} color="#818cf8" />, label: 'SQL Queries', value: telemetry.sql_queries_executed },
+    { icon: <Cpu size={13} color="#fbbf24" />, label: 'Gemini Calls', value: telemetry.gemini_calls },
+    { icon: <Zap size={13} color="#34d399" />, label: 'Tokens', value: telemetry.tokens_used },
+    { icon: <Clock size={13} />, label: 'Latency', value: `${telemetry.latency_seconds}s` },
+    { icon: <DollarSign size={13} color="#34d399" />, label: 'Cost', value: `$${telemetry.cost_usd.toFixed(2)}` },
+  ];
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Clock size={14} />
-          <span>Latency: <strong style={{ color: '#fff' }}>{telemetry.latency_seconds}s</strong></span>
+  return (
+    <div className="telemetry-bar">
+      {items.map(({ icon, label, value }) => (
+        <div key={label} className="telemetry-item">
+          {icon}
+          <span>{label}: <strong>{value}</strong></span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <DollarSign size={14} color="var(--status-green)" />
-          <span>Cost: <strong style={{ color: '#fff' }}>${telemetry.cost_usd.toFixed(2)}</strong></span>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }

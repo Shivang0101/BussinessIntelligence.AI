@@ -1,0 +1,16 @@
+[
+  {
+    "hypothesis_id": "node_revenue_avg_order_value",
+    "feedback_type": "agree",
+    "user_comment": "Agreed with automated root cause",
+    "target_month": "2018-08",
+    "persona": "coo"
+  },
+  {
+    "hypothesis_id": "node_revenue_avg_order_value",
+    "feedback_type": "agree",
+    "user_comment": "Agreed with automated root cause",
+    "target_month": "2018-08",
+    "persona": "coo"
+  }
+]

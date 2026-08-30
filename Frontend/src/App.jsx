@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import TopBar from './components/TopBar';
 import KPICards from './components/KPICards';
 import DiagnosticTree from './components/DiagnosticTree';
@@ -9,6 +10,11 @@ import DataUpload from './components/DataUpload';
 import TelemetryBar from './components/TelemetryBar';
 
 const API_BASE = 'http://localhost:8000';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } },
+};
 
 export default function App() {
   const [selectedMonth, setSelectedMonth] = useState('2018-08');
@@ -24,7 +30,6 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 1. Fetch Timeline Series
   useEffect(() => {
     fetch(`${API_BASE}/api/timeline`)
       .then(res => res.json())
@@ -32,7 +37,6 @@ export default function App() {
       .catch(err => console.error('Timeline fetch error:', err));
   }, []);
 
-  // 2. Fetch KPI Summary Cards when month or persona changes
   useEffect(() => {
     fetch(`${API_BASE}/api/kpis?month=${selectedMonth}&persona=${selectedPersona}`)
       .then(res => res.json())
@@ -40,7 +44,6 @@ export default function App() {
       .catch(err => console.error('KPI Cards fetch error:', err));
   }, [selectedMonth, selectedPersona]);
 
-  // 3. Fetch Diagnostic Tree & AI Narrative when KPI, month, or persona changes
   useEffect(() => {
     setLoading(true);
     fetch(`${API_BASE}/api/investigate`, {
@@ -62,7 +65,6 @@ export default function App() {
       .finally(() => setLoading(false));
   }, [selectedMonth, selectedKPI, selectedPersona]);
 
-  // 4. Handle What-If simulation call
   const handleSimulate = async (kpi, driver, newValue) => {
     const res = await fetch(`${API_BASE}/api/simulate`, {
       method: 'POST',
@@ -72,7 +74,6 @@ export default function App() {
     return await res.json();
   };
 
-  // 5. Handle Feedback Submission
   const handleFeedbackSubmit = async (hypothesisId, type, comment) => {
     try {
       await fetch(`${API_BASE}/api/feedback`, {
@@ -86,14 +87,13 @@ export default function App() {
           persona: selectedPersona
         })
       });
-      alert(`Feedback recorded for ${hypothesisId}`);
     } catch (err) {
       console.error('Feedback error:', err);
     }
   };
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
+    <div className="app-shell">
       <TopBar 
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
@@ -102,22 +102,33 @@ export default function App() {
         onOpenUpload={() => setIsUploadOpen(true)}
       />
 
-      <KPICards 
-        cards={kpiCards}
-        selectedKPI={selectedKPI}
-        setSelectedKPI={setSelectedKPI}
-      />
+      <motion.div variants={pageVariants} initial="initial" animate="animate">
+        <KPICards 
+          cards={kpiCards}
+          selectedKPI={selectedKPI}
+          setSelectedKPI={setSelectedKPI}
+        />
+      </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
-        <div>
+      <div className="main-grid">
+        <motion.div 
+          initial={{ opacity: 0, x: -16 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ delay: 0.15, duration: 0.45 }}
+        >
           <DiagnosticTree 
             treeData={treeData}
+            loading={loading}
             onFeedbackSubmit={handleFeedbackSubmit}
           />
           <WhatIfSimulator selectedKPI={selectedKPI} onSimulate={handleSimulate} />
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div 
+          initial={{ opacity: 0, x: 16 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ delay: 0.25, duration: 0.45 }}
+        >
           <NarrativePanel 
             narrative={narrative}
             persona={selectedPersona}
@@ -127,21 +138,24 @@ export default function App() {
             selectedMonth={selectedMonth}
             selectedKPI={selectedKPI}
           />
-        </div>
+        </motion.div>
       </div>
 
       <TelemetryBar telemetry={telemetry} />
 
-      <DataUpload 
-        isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
-        onUploadComplete={() => {
-          setIsUploadOpen(false);
-          // Refresh timeline and KPI cards
-          fetch(`${API_BASE}/api/timeline`).then(res => res.json()).then(d => setTimelineData(d.data || []));
-          fetch(`${API_BASE}/api/kpis?month=${selectedMonth}&persona=${selectedPersona}`).then(res => res.json()).then(d => setKpiCards(d.cards || []));
-        }}
-      />
+      <AnimatePresence>
+        {isUploadOpen && (
+          <DataUpload 
+            isOpen={isUploadOpen}
+            onClose={() => setIsUploadOpen(false)}
+            onUploadComplete={() => {
+              setIsUploadOpen(false);
+              fetch(`${API_BASE}/api/timeline`).then(res => res.json()).then(d => setTimelineData(d.data || []));
+              fetch(`${API_BASE}/api/kpis?month=${selectedMonth}&persona=${selectedPersona}`).then(res => res.json()).then(d => setKpiCards(d.cards || []));
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
