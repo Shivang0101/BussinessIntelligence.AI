@@ -40,20 +40,20 @@ export default function WhatIfSimulator({ selectedKPI = 'revenue', onSimulate })
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)', pb: '12px' }}>
+    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
         <div style={{ background: 'var(--primary-gradient)', padding: '7px', borderRadius: '10px', display: 'flex', color: '#fff' }}>
           <Sliders size={18} />
         </div>
         <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-            What-If Scenario Simulator
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+            What-If Simulator
           </h3>
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>OLS Linear Regression Sensitivity Model</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OLS Linear Regression Engine</span>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', alignItems: 'center', flex: 1 }}>
         <div>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
             Adjust Driver Metric:
@@ -68,23 +68,24 @@ export default function WhatIfSimulator({ selectedKPI = 'revenue', onSimulate })
             }}
             style={{ 
               width: '100%', 
-              background: 'rgba(0,0,0,0.4)', 
-              color: '#fff', 
-              border: '1px solid var(--bg-card-border)', 
+              background: 'var(--bg-app)', 
+              color: 'var(--text-primary)', 
+              border: '1px solid var(--border-color)', 
               padding: '10px 14px', 
               borderRadius: '10px', 
               fontSize: '0.85rem', 
               marginBottom: '16px',
-              cursor: 'pointer' 
+              cursor: 'pointer',
+              outline: 'none'
             }}
           >
             {driverOptions.map(o => (
-              <option key={o.key} value={o.key} style={{ background: '#121826' }}>{o.title}</option>
+              <option key={o.key} value={o.key}>{o.title}</option>
             ))}
           </select>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-            <span>Target Driver Setting:</span>
+            <span>Target Setting:</span>
             <strong style={{ color: 'var(--primary-accent)' }}>{newValue} {currentOption.unit}</strong>
           </div>
 
@@ -109,33 +110,32 @@ export default function WhatIfSimulator({ selectedKPI = 'revenue', onSimulate })
               border: 'none', 
               padding: '10px 18px', 
               borderRadius: '10px', 
-              fontWeight: 700, 
+              fontWeight: 600, 
               fontSize: '0.88rem', 
               cursor: 'pointer', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 16px var(--primary-glow)'
+              gap: '8px'
             }}
           >
             <Sparkles size={16} />
-            {loading ? 'Calculating OLS Regression...' : 'Run Scenario Simulation'}
+            {loading ? 'Calculating...' : 'Run Simulation'}
           </button>
         </div>
 
         {/* Results display */}
-        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ background: 'var(--bg-app)', padding: '20px', borderRadius: '14px', border: '1px solid var(--border-color)', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {simulationResult ? (
             <div>
               <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px', letterSpacing: '0.05em' }}>
                 Predicted {simulationResult.kpi_title} Impact
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px' }}>
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Current Baseline</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#94a3b8' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Baseline</div>
+                  <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
                     {formatCurrencyOrNumber(simulationResult.current_kpi_value)}
                   </div>
                 </div>
@@ -143,7 +143,7 @@ export default function WhatIfSimulator({ selectedKPI = 'revenue', onSimulate })
                 <ArrowRight size={18} color="var(--primary-accent)" />
 
                 <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--primary-accent)' }}>Simulated Projection</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--primary-accent)' }}>Projected</div>
                   <div style={{ fontSize: '1.15rem', fontWeight: 800, color: simulationResult.delta_kpi_pct >= 0 ? 'var(--status-green)' : 'var(--status-red)' }}>
                     {formatCurrencyOrNumber(simulationResult.simulated_kpi_value)}
                   </div>
@@ -152,16 +152,16 @@ export default function WhatIfSimulator({ selectedKPI = 'revenue', onSimulate })
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', fontWeight: 700, color: simulationResult.delta_kpi_pct >= 0 ? 'var(--status-green)' : 'var(--status-red)' }}>
                 {simulationResult.delta_kpi_pct >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                <span>{simulationResult.delta_kpi_pct >= 0 ? '+' : ''}{simulationResult.delta_kpi_pct}% Projected Shift</span>
+                <span>{simulationResult.delta_kpi_pct >= 0 ? '+' : ''}{simulationResult.delta_kpi_pct}% Shift</span>
               </div>
 
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '8px' }}>
-                Regression coef: <code style={{ color: '#a5b4fc' }}>{simulationResult.regression_coefficient}</code> • R² model fit = <code style={{ color: '#a5b4fc' }}>{simulationResult.r2_score}</code>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '12px', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
+                Coef: <code style={{ color: 'var(--primary-accent)' }}>{simulationResult.regression_coefficient}</code> • R² = <code style={{ color: 'var(--primary-accent)' }}>{simulationResult.r2_score}</code>
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', padding: '24px 0' }}>
-              Adjust slider and click <strong>"Run Scenario Simulation"</strong> to model target KPI change.
+            <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              Adjust slider and click <strong>"Run Simulation"</strong> to model target KPI change.
             </div>
           )}
         </div>

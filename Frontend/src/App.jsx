@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import TopBar from './components/TopBar';
+import Sidebar from './components/Sidebar';
 import KPICards from './components/KPICards';
 import DiagnosticTree from './components/DiagnosticTree';
 import NarrativePanel from './components/NarrativePanel';
@@ -11,15 +11,24 @@ import TelemetryBar from './components/TelemetryBar';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-const pageVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } },
+const containerVariants = {
+  initial: { opacity: 0 },
+  animate: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 } 
+  },
+};
+
+const itemVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export default function App() {
   const [selectedMonth, setSelectedMonth] = useState('2018-08');
   const [selectedPersona, setSelectedPersona] = useState('coo');
   const [selectedKPI, setSelectedKPI] = useState('revenue');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   const [kpiCards, setKpiCards] = useState([]);
   const [treeData, setTreeData] = useState(null);
@@ -43,6 +52,14 @@ export default function App() {
       .then(data => setKpiCards(data.cards || []))
       .catch(err => console.error('KPI Cards fetch error:', err));
   }, [selectedMonth, selectedPersona]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.setAttribute('data-theme', 'dark');
+    } else {
+      document.body.removeAttribute('data-theme');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     setLoading(true);
@@ -94,54 +111,71 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <TopBar 
+      <Sidebar 
         selectedMonth={selectedMonth}
         setSelectedMonth={setSelectedMonth}
         selectedPersona={selectedPersona}
         setSelectedPersona={setSelectedPersona}
         onOpenUpload={() => setIsUploadOpen(true)}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
       />
 
-      <motion.div variants={pageVariants} initial="initial" animate="animate">
-        <KPICards 
-          cards={kpiCards}
-          selectedKPI={selectedKPI}
-          setSelectedKPI={setSelectedKPI}
-        />
-      </motion.div>
+      <main className="dashboard-content">
+        <header className="dashboard-header">
+          <h2>Diagnostic Dashboard</h2>
+          <p>Analyzing key performance indicators for {selectedMonth}</p>
+        </header>
 
-      <div className="main-grid">
-        <motion.div 
-          initial={{ opacity: 0, x: -16 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          transition={{ delay: 0.15, duration: 0.45 }}
-        >
-          <DiagnosticTree 
-            treeData={treeData}
-            loading={loading}
-            onFeedbackSubmit={handleFeedbackSubmit}
-          />
-          <WhatIfSimulator selectedKPI={selectedKPI} onSimulate={handleSimulate} />
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, x: 16 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          transition={{ delay: 0.25, duration: 0.45 }}
-        >
-          <NarrativePanel 
-            narrative={narrative}
-            persona={selectedPersona}
-          />
-          <TimelineCharts 
-            timelineData={timelineData}
-            selectedMonth={selectedMonth}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <KPICards 
+            cards={kpiCards}
             selectedKPI={selectedKPI}
+            setSelectedKPI={setSelectedKPI}
           />
         </motion.div>
-      </div>
 
-      <TelemetryBar telemetry={telemetry} />
+        <motion.div 
+          className="bento-grid"
+          variants={containerVariants} 
+          initial="initial" 
+          animate="animate"
+        >
+          {/* Main Large Component */}
+          <motion.div variants={itemVariants} className="bento-item span-8">
+            <DiagnosticTree 
+              treeData={treeData}
+              loading={loading}
+              onFeedbackSubmit={handleFeedbackSubmit}
+            />
+          </motion.div>
+
+          {/* AI Narrative Panel */}
+          <motion.div variants={itemVariants} className="bento-item span-4">
+            <NarrativePanel 
+              narrative={narrative}
+              persona={selectedPersona}
+            />
+          </motion.div>
+
+          {/* Secondary Data Blocks */}
+          <motion.div variants={itemVariants} className="bento-item span-6">
+            <TimelineCharts 
+              timelineData={timelineData}
+              selectedMonth={selectedMonth}
+              selectedKPI={selectedKPI}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants} className="bento-item span-6">
+            <WhatIfSimulator 
+              selectedKPI={selectedKPI} 
+              onSimulate={handleSimulate} 
+            />
+          </motion.div>
+        </motion.div>
+
+        <TelemetryBar telemetry={telemetry} />
+      </main>
 
       <AnimatePresence>
         {isUploadOpen && (

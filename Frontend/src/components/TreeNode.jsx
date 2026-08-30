@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronDown, Sparkles, AlertCircle, HelpCircle, ThumbsUp, ThumbsDown, ArrowDownRight, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { ChevronRight, ChevronDown, ThumbsUp, ThumbsDown, ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import EvidenceCard from './EvidenceCard';
 import HypothesisTestResults from './HypothesisTestResults';
 
@@ -17,9 +17,9 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
   const isNegative = (node.mom_delta_pct || 0) < 0;
 
   const getImpactColor = (c) => {
-    if (c >= 30) return '#f43f5e'; // High Rose Red
-    if (c >= 15) return '#f59e0b'; // Medium Amber
-    return '#64748b'; // Muted Slate
+    if (c >= 30) return 'var(--status-red)';
+    if (c >= 15) return 'var(--status-yellow)';
+    return 'var(--text-muted)';
   };
 
   const formatVal = (val, format, unit) => {
@@ -34,27 +34,8 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
       {/* Branch connecting lines */}
       {level > 0 && (
         <>
-          <div 
-            style={{ 
-              position: 'absolute', 
-              left: '14px', 
-              top: '-14px', 
-              bottom: isLast ? 'calc(100% - 24px)' : '0px', 
-              width: '2px', 
-              background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0.1) 100%)' 
-            }} 
-          />
-          <div 
-            style={{ 
-              position: 'absolute', 
-              left: '14px', 
-              top: '24px', 
-              width: '20px', 
-              height: '2px', 
-              background: 'var(--primary-accent)',
-              borderRadius: '2px'
-            }} 
-          />
+          <div className="tree-branch-line" style={{ bottom: isLast ? 'calc(100% - 24px)' : '0px' }} />
+          <div className="tree-node-connector" />
         </>
       )}
 
@@ -67,18 +48,18 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
           padding: '16px 20px',
           borderRadius: '14px',
           borderColor: isResidual 
-            ? 'rgba(245, 158, 11, 0.3)' 
+            ? 'var(--status-yellow-border)' 
             : level === 0 
             ? 'var(--primary-accent)' 
-            : 'rgba(255, 255, 255, 0.08)',
+            : 'var(--border-color)',
           boxShadow: level === 0 
-            ? '0 0 25px rgba(99, 102, 241, 0.15)' 
-            : '0 4px 20px rgba(0,0,0,0.2)',
+            ? '0 0 0 1px var(--primary-accent), var(--shadow-panel)' 
+            : 'var(--shadow-card)',
           background: isResidual 
-            ? 'rgba(245, 158, 11, 0.04)' 
+            ? 'var(--status-yellow-bg)' 
             : level === 0 
-            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(15, 22, 38, 0.9) 100%)' 
-            : 'rgba(255, 255, 255, 0.025)'
+            ? 'var(--primary-light)' 
+            : 'var(--bg-card)'
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
@@ -87,8 +68,8 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
               <button 
                 onClick={() => setExpanded(!expanded)} 
                 style={{ 
-                  background: 'rgba(255,255,255,0.06)', 
-                  border: 'none', 
+                  background: 'var(--bg-app)', 
+                  border: '1px solid var(--border-color)', 
                   color: 'var(--text-primary)', 
                   padding: '4px', 
                   borderRadius: '6px', 
@@ -109,7 +90,7 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
                 </span>
 
                 {node.current_value !== undefined && (
-                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9', background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', background: 'var(--bg-app)', border: '1px solid var(--border-color)', padding: '2px 8px', borderRadius: '6px' }}>
                     {formatVal(node.current_value, node.format, node.unit)}
                   </span>
                 )}
@@ -141,10 +122,10 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
                   {conf > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Confidence:</span>
-                      <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: '60px', height: '6px', background: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
                         <div style={{ width: `${conf}%`, height: '100%', background: 'var(--primary-accent)', borderRadius: '3px' }} />
                       </div>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#a5b4fc' }}>{conf}%</span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary-accent)' }}>{conf}%</span>
                     </div>
                   )}
                 </div>
@@ -161,7 +142,7 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
 
           {/* Feedback buttons */}
           {!isResidual && level > 0 && (
-            <div style={{ display: 'flex', gap: '4px', background: 'rgba(0,0,0,0.2)', padding: '2px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-app)', border: '1px solid var(--border-color)', padding: '2px', borderRadius: '8px' }}>
               <button 
                 onClick={() => onFeedbackSubmit(node.id, 'agree', 'Agreed with automated root cause')}
                 style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
@@ -182,15 +163,16 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
 
         {/* Tab Navigation for Evidence & Validation */}
         {!isResidual && (node.evidence?.length > 0 || node.test_results) && (
-          <div style={{ marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
+          <div style={{ marginTop: '12px', borderTop: '1px solid var(--border-color)', paddingTop: '10px' }}>
             <div style={{ display: 'flex', gap: '10px' }}>
               {node.evidence?.length > 0 && (
                 <button 
                   onClick={() => setActiveTab(activeTab === 'evidence' ? 'summary' : 'evidence')}
                   style={{ 
-                    background: activeTab === 'evidence' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.04)', 
-                    border: 'none', 
-                    color: activeTab === 'evidence' ? '#a5b4fc' : 'var(--text-muted)', 
+                    background: activeTab === 'evidence' ? 'var(--primary-light)' : 'var(--bg-app)',
+                    border: '1px solid',
+                    borderColor: activeTab === 'evidence' ? 'var(--primary-accent)' : 'var(--border-color)',
+                    color: activeTab === 'evidence' ? 'var(--primary-accent)' : 'var(--text-muted)', 
                     padding: '4px 10px', 
                     borderRadius: '6px', 
                     fontSize: '0.72rem', 
@@ -206,8 +188,9 @@ export default function TreeNode({ node, level = 0, isLast = false, onFeedbackSu
                 <button 
                   onClick={() => setActiveTab(activeTab === 'validation' ? 'summary' : 'validation')}
                   style={{ 
-                    background: activeTab === 'validation' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.04)', 
-                    border: 'none', 
+                    background: activeTab === 'validation' ? 'var(--status-green-bg)' : 'var(--bg-app)',
+                    border: '1px solid',
+                    borderColor: activeTab === 'validation' ? 'var(--status-green)' : 'var(--border-color)', 
                     color: activeTab === 'validation' ? 'var(--status-green)' : 'var(--text-muted)', 
                     padding: '4px 10px', 
                     borderRadius: '6px', 
