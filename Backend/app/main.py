@@ -20,10 +20,19 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Enable CORS for local dev frontend
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "https://bussiness-intelligence-ai.vercel.app",
+    "https://*.vercel.app",
+    "*"
+]
+
+# Enable CORS for frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +54,15 @@ class FeedbackRequest(BaseModel):
     user_comment: str
     target_month: str
     persona: str
+
+@app.get("/")
+def root():
+    return {
+        "service": "BusinessIntelligence.ai Backend API",
+        "status": "online",
+        "version": "2.0.0",
+        "docs_url": "/docs"
+    }
 
 @app.get("/health")
 def health_check():
