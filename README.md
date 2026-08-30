@@ -3,7 +3,7 @@
 # ⚡ BusinessIntelligence.ai (BI.ai)
 ### *Deterministic KPI Intelligence-to-Action Engine with Zero-Hallucination Guarantees*
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-xyz.com-2563eb?style=for-the-badge&logo=vercel&logoColor=white)](https://xyz.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-bussinessintelligenceai.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white)](https://bussinessintelligenceai.vercel.app/)
 [![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi&logoColor=white)](http://localhost:8000/docs)
 [![Docker](https://img.shields.io/badge/Docker%20Compose-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#-quick-start--deployment)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -30,8 +30,8 @@
 
 ## 🌐 Live Deployment & Demo
 
-- **🚀 Web Application URL**: [https://xyz.com](https://xyz.com) *(Click to launch interactive prototype)*
-- **📖 Interactive API Documentation**: [https://xyz.com/docs](https://xyz.com/docs) *(Swagger UI / OpenAPI)*
+- **🚀 Web Application URL**: [https://bussinessintelligenceai.vercel.app/](https://bussinessintelligenceai.vercel.app/) *(Click to launch interactive prototype)*
+- **📖 Interactive API Documentation**: [https://bussinessintelligenceai.vercel.app/docs](https://bussinessintelligenceai.vercel.app/docs) *(Swagger UI / OpenAPI / Local: `http://localhost:8000/docs`)*
 - **📦 Dataset Scope**: 26 Months of Brazilian E-Commerce (~300,000 live transactional & customer review rows on Supabase PostgreSQL)
 
 ---
